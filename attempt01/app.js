@@ -80,13 +80,13 @@ const rightPaddleX = canvas.width - paddleWidth;
 let leftPaddleSpeed = 0;
 let leftPaddleMovingUp = false;
 let leftPaddleMovingDown = false;
-const maxLeftPaddleSpeed = 5; // Maximum speed
+const maxLeftPaddleSpeed = 8; // Maximum speed
 
 // right paddle
 let rightPaddleSpeed = 0;
 let rightPaddleMovingUp = false;
 let rightPaddleMovingDown = false;
-const maxrightPaddleSpeed = 5; // Maximum speed
+const maxrightPaddleSpeed = 8; // Maximum speed
 
 // Initialize variables
 
@@ -105,6 +105,7 @@ let leftScore = 0;
 let rightScore = 0;
 let gameOver = false;
 let gamePaused = false;
+let ballRadius = 10;
 
 function resetBall() {
   ballX = canvas.width / 2;
@@ -157,10 +158,9 @@ function draw() {
     paddleHeight,
   );
 
-  // Draw ball
   ctx.beginPath();
-  ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
   ctx.fillStyle = 'white';
+  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
   ctx.fill();
   ctx.closePath();
 
@@ -243,7 +243,7 @@ function move() {
     );
   }
 
-  // Left paddle speed
+  // Left paddle collision
   if (
     ballX < leftPaddleX + paddleWidth &&
     ballY > leftPaddleY &&
@@ -253,7 +253,23 @@ function move() {
 
     // Add "spin" effect based on both paddle speed and collision point
     const deltaY = ballY - (leftPaddleY + paddleHeight / 2);
-    ballSpeedY = deltaY * 0.3 + leftPaddleSpeed * 0.1;
+    ballSpeedY = deltaY * 0.3 + leftPaddleSpeed * 0.3;
+  } else if (
+    ballX > leftPaddleX &&
+    ballX < leftPaddleX + paddleWidth &&
+    ballY >= leftPaddleY - ballRadius &&
+    ballY <= leftPaddleY
+  ) {
+    ballSpeedY = -ballSpeedY;
+  }
+  // Left paddle collision - bottom edge
+  else if (
+    ballX > leftPaddleX &&
+    ballX < leftPaddleX + paddleWidth &&
+    ballY >= leftPaddleY + paddleHeight &&
+    ballY <= leftPaddleY + paddleHeight + ballRadius
+  ) {
+    ballSpeedY = -ballSpeedY;
   }
 
   // Right paddle collision
@@ -266,7 +282,24 @@ function move() {
 
     // Add "spin" effect based on both paddle speed and collision point
     const deltaY = ballY - (rightPaddleY + paddleHeight / 2);
-    ballSpeedY = deltaY * 0.3 + rightPaddleSpeed * 0.1;
+    ballSpeedY = deltaY * 0.3 + rightPaddleSpeed * 0.3;
+  } // Right paddle collision - top edge
+  else if (
+    ballX > rightPaddleX - paddleWidth &&
+    ballX < rightPaddleX &&
+    ballY >= rightPaddleY - ballRadius &&
+    ballY <= rightPaddleY
+  ) {
+    ballSpeedY = -ballSpeedY;
+  }
+  // Right paddle collision - bottom edge
+  else if (
+    ballX > rightPaddleX - paddleWidth &&
+    ballX < rightPaddleX &&
+    ballY >= rightPaddleY + paddleHeight &&
+    ballY <= rightPaddleY + paddleHeight + ballRadius
+  ) {
+    ballSpeedY = -ballSpeedY;
   }
 
   if (ballX < 0) {
